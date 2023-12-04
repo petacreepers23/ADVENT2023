@@ -39,9 +39,8 @@ proc part02(filename:string):int64 =
             instances:1
         )
     for i in table.keys:   
-        for _ in countup(1,table[i].instances):
-            for extra in countup(i+1,i+table[i].ammount_winners):
-                table[extra].instances = table[extra].instances+1
+        for extra in countup(i+1,i+table[i].ammount_winners):
+            table[extra].instances = table[extra].instances+table[i].instances
 
     for card in table.values:
         result = result + card.instances
