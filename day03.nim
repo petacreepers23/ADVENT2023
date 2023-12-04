@@ -37,7 +37,6 @@ proc getPartNumbers(line:string,linenum:int): seq[PartNumber] =
             result.add(aux)
             num = ""
         i = i + 1
-    return result
 
 proc getSymbols(line:string,linenum:int): seq[Symbol] =
     var i:int = 0
@@ -49,7 +48,6 @@ proc getSymbols(line:string,linenum:int): seq[Symbol] =
                 position: i)
             result.add(aux)
         i = i + 1
-    return result
 
 proc hasPartAround(symbol:Symbol,part:PartNumber):bool =
     #top right
@@ -88,21 +86,21 @@ proc filterInvalidPartNumbers(parts:seq[PartNumber],symbols:seq[Symbol]):seq[Par
     for part in parts:
         if isAroundAnySymbol(part,symbols):
             result.add(part)
-    return result
 
-proc part01(filename:string):int =
-    let entireFile = readFile(filename).splitLines()
+proc getPartsAndSymbols(filename:string):(seq[PartNumber],seq[Symbol]) =
     var partNumberArray: seq[PartNumber]
     var symbolsNumberArray: seq[Symbol]
     var i:int = 0
-    for line in entireFile:
+    for line in open(filename).lines:
         partNumberArray.join(getPartNumbers(line,i))
         symbolsNumberArray.join(getSymbols(line,i))
         i = i + 1
-    let goodParts = filterInvalidPartNumbers(partNumberArray,symbolsNumberArray)
+    (filterInvalidPartNumbers(partNumberArray,symbolsNumberArray),symbolsNumberArray)
+
+proc part01(filename:string):int =
+    let (goodParts,_) = getPartsAndSymbols(filename)
     for part in goodParts:
         result = result + part.number
-    return result
 
 proc getGearRatio(symbol:Symbol,parts:seq[PartNumber]):int =
     var numberOfParts=0
@@ -117,19 +115,10 @@ proc getGearRatio(symbol:Symbol,parts:seq[PartNumber]):int =
     return result
 
 proc part02(filename:string):int =
-    let entireFile = readFile(filename).splitLines()
-    var partNumberArray: seq[PartNumber]
-    var symbolsNumberArray: seq[Symbol]
-    var i:int = 0
-    for line in entireFile:
-        partNumberArray.join(getPartNumbers(line,i))
-        symbolsNumberArray.join(getSymbols(line,i))
-        i = i + 1
-    let goodParts = filterInvalidPartNumbers(partNumberArray,symbolsNumberArray)
+    let (goodParts,symbolsNumberArray) = getPartsAndSymbols(filename)
     for symbol in symbolsNumberArray:
         if(symbol.symbol=='*'):
             result = result + getGearRatio(symbol,goodParts)
-    return result
 
 proc main() =
     doAssert(part01("inputs/example_1_day03.txt")==4361)
