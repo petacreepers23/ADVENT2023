@@ -1,4 +1,4 @@
-import std/[sequtils, strutils, sugar, tables, enumerate]
+import std/[sequtils, strutils, sugar]
 
 type Range = object
     dst_range_start:uint
