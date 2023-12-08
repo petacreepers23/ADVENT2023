@@ -1,4 +1,4 @@
-import std/[sequtils, strutils, sugar, tables, enumerate,algorithm]
+import std/[sequtils, strutils, tables, enumerate,algorithm]
 
 type Mano = object
     cartas : string
