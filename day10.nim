@@ -1,8 +1,5 @@
 import std/[sequtils, strutils, enumerate]
 
-func allEqual(s: openArray[int]): bool =
-  allIt(s, it == s[0])
-
 type Position = object
     i:int
     j:int
@@ -136,6 +133,37 @@ proc part01(filename:string):int =
         result = result + 1
     return int(result/2)
 
+proc part02(filename:string):int =
+    let mapa = readFile(filename).splitLines.filterIt(it!="")
+    let posicion_inicial = getInitialPos(mapa)
+    let tuberia_inicial = getInitialPipeShape(posicion_inicial,mapa)
+    let direccion_inicial = getInitialDir(tuberia_inicial)
+    doAssert(tuberia_inicial!='.')
+
+    var posiciones_pasadas:seq[Position]
+    var (cur_pos,cur_dir,cur_tuberia) = avancen(posicion_inicial,direccion_inicial,tuberia_inicial,mapa)
+    posiciones_pasadas.add(cur_pos)
+    while(cur_pos!=posicion_inicial):
+        (cur_pos,cur_dir,cur_tuberia) = avancen(cur_pos,cur_dir,cur_tuberia,mapa)
+        posiciones_pasadas.add(cur_pos)
+    #Even–odd rule -- discarded as F--7 is not always equivalent to |
+    #lets try with shoelace formula to get area of curve and substract the length of it
+    #combined with  Pick's theorem to get interior points
+    var current_area = posiciones_pasadas[posiciones_pasadas.len-1].j*posiciones_pasadas[0].i - 
+                    posiciones_pasadas[0].j*posiciones_pasadas[posiciones_pasadas.len-1].i
+    for i in countup(0, posiciones_pasadas.len-2, 1):
+        let (x1,y1,x2,y2) = (
+            posiciones_pasadas[i].j,
+            posiciones_pasadas[i].i,
+            posiciones_pasadas[i+1].j,
+            posiciones_pasadas[i+1].i)
+        current_area = current_area + x1*y2-x2*y1
+    current_area = abs(current_area)
+    #Pick's theorem    
+    result = int(current_area / 2) - int(posiciones_pasadas.len/2) + 1 
+    #echo "res: ",result
+    #echo "area: ",int(current_area / 2)
+    #echo "coords: ",posiciones_pasadas.len 
 
 proc main() =
     doAssert(part01("inputs/example_1_day10.txt")==4)
@@ -143,7 +171,11 @@ proc main() =
     doAssert(part01("inputs/example_3_day10.txt")==8)
     doAssert(part01("inputs/example_4_day10.txt")==8)
     echo "Parte 1: " & $part01("inputs/day10.txt")
-    #doAssert(part02("inputs/example_1_day10.txt")==2)
-    #echo "Parte 2: " & $part02("inputs/day10.txt")
+
+    doAssert(part02("inputs/example_5_day10.txt")==4)
+    doAssert(part02("inputs/example_6_day10.txt")==4)
+    doAssert(part02("inputs/example_7_day10.txt")==8)
+    doAssert(part02("inputs/example_8_day10.txt")==10)
+    echo "Parte 2: " & $part02("inputs/day10.txt")
 when isMainModule:
   main()
