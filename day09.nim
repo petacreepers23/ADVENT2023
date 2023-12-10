@@ -1,5 +1,4 @@
-import sequtils
-import std/[sequtils, strutils, sugar, tables, enumerate]
+import std/[sequtils, strutils]
 
 func allEqual(s: openArray[int]): bool =
   allIt(s, it == s[0])
